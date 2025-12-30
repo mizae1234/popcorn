@@ -65,7 +65,10 @@ export default function Footer() {
                         <h6 className="fw-bold mb-3">ติดต่อเรา</h6>
                         <p className="text-white-50 mb-2">
                             <i className="bi bi-envelope me-2"></i>
-                            support@popcorncreator.com
+                            <a href="https://lin.ee/t7Rsm9t" target="_blank">Line : https://lin.ee/t7Rsm9t</a>
+                        </p>
+                        <p className="text-white-50 mb-2">
+                            LineID : @479ydcms
                         </p>
                         <div className="d-flex gap-3 mt-3">
                             <a href="#" className="text-white fs-4">
@@ -89,7 +92,7 @@ export default function Footer() {
                 <div className="row align-items-center">
                     <div className="col-md-6 text-center text-md-start">
                         <small className="text-white-50">
-                            © 2024 Popcorn Creator. All rights reserved.
+                            © 2025 Popcorn Creator. All rights reserved.
                         </small>
                     </div>
                     <div className="col-md-6 text-center text-md-end">
