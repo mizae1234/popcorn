@@ -9,8 +9,8 @@ services:
     env_file:
       - .env
     environment:
-      - DATABASE_URL=postgresql://pop_user:%40Kanitta12PRD@localhost:5432/popcorn_service?schema=public
-      - NEXTAUTH_URL=https://popcorn-creator.com
+      - DATABASE_URL=${DATABASE_URL}
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
