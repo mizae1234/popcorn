@@ -1,0 +1,31 @@
+version: '3.9'
+
+services:
+  app:
+    container_name: popcorn-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      # DATABASE_URL must be provided in .env file
+      - DATABASE_URL=${DATABASE_URL}
+      - NEXTAUTH_URL=https://popcorn-creator.com
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - OMISE_SECRET_KEY=${OMISE_SECRET_KEY}
+      - OMISE_PUBLIC_KEY=${OMISE_PUBLIC_KEY}
+      - PHAYA_API_KEY=${PHAYA_API_KEY}
+      - KIE_API_KEY=${KIE_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+    networks:
+      - popcorn-net
+
+networks:
+  popcorn-net:
+
