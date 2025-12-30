@@ -6,11 +6,11 @@ RUN apt-get update && apt-get install -y openssl git && rm -rf /var/lib/apt/list
 WORKDIR /app
 
 # Copy package files and prisma schema
-COPY package.json ./
+COPY package.json package-lock.json ./
 COPY prisma ./prisma/
 
-# Install dependencies - using npm install with legacy-peer-deps
-RUN npm install --legacy-peer-deps
+# Install dependencies
+RUN npm ci --legacy-peer-deps
 
 # Rebuild the source code only when needed
 FROM base AS builder
