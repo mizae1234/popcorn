@@ -28,6 +28,9 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /app
 
+# Install OpenSSL for Prisma and ca-certificates for HTTPS
+RUN apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
+
 ENV NODE_ENV production
 
 RUN addgroup --system --gid 1001 nodejs
