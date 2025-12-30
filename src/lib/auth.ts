@@ -1,25 +1,46 @@
 import { NextAuthOptions } from 'next-auth'
-import GoogleProvider from 'next-auth/providers/google'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import { prisma } from './prisma'
+
+// Custom Google OAuth provider without OIDC discovery
+const CustomGoogleProvider = {
+    id: "google",
+    name: "Google",
+    type: "oauth" as const,
+    authorization: {
+        url: "https://accounts.google.com/o/oauth2/v2/auth",
+        params: {
+            scope: "openid email profile",
+            response_type: "code",
+        }
+    },
+    token: {
+        url: "https://oauth2.googleapis.com/token",
+    },
+    userinfo: {
+        url: "https://openidconnect.googleapis.com/v1/userinfo",
+    },
+    clientId: process.env.GOOGLE_CLIENT_ID!,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    profile(profile: {
+        sub: string;
+        name: string;
+        email: string;
+        picture: string;
+    }) {
+        return {
+            id: profile.sub,
+            name: profile.name,
+            email: profile.email,
+            image: profile.picture,
+        }
+    },
+}
 
 export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(prisma) as NextAuthOptions['adapter'],
     providers: [
-        GoogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID!,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-            // Bypass OIDC discovery to avoid listener bug
-            authorization: {
-                url: "https://accounts.google.com/o/oauth2/v2/auth",
-                params: {
-                    scope: "openid email profile",
-                    response_type: "code",
-                }
-            },
-            token: "https://oauth2.googleapis.com/token",
-            userinfo: "https://openidconnect.googleapis.com/v1/userinfo",
-        }),
+        CustomGoogleProvider,
     ],
     session: {
         strategy: 'jwt',
@@ -88,5 +109,5 @@ export const authOptions: NextAuthOptions = {
     pages: {
         signIn: '/auth/signin',
     },
-    debug: true, // Enable debug mode to see error logs
+    debug: process.env.NODE_ENV === 'development',
 }
