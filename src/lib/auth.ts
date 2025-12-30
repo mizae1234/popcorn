@@ -4,6 +4,7 @@ import { PrismaAdapter } from '@auth/prisma-adapter'
 import { prisma } from './prisma'
 
 export const authOptions: NextAuthOptions = {
+    useSecureCookies: false, // Force non-secure cookies to fix OAuthSignin on HTTP
     adapter: PrismaAdapter(prisma) as NextAuthOptions['adapter'],
     providers: [
         GoogleProvider({
