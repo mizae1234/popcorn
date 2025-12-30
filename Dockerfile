@@ -2,15 +2,15 @@ FROM node:18-slim AS base
 
 # Install dependencies only when needed
 FROM base AS deps
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y openssl git && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 # Copy package files and prisma schema
 COPY package.json ./
 COPY prisma ./prisma/
 
-# Install dependencies - using npm install directly
-RUN npm install
+# Install dependencies - using npm install with legacy-peer-deps
+RUN npm install --legacy-peer-deps
 
 # Rebuild the source code only when needed
 FROM base AS builder
