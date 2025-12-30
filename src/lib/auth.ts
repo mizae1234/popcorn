@@ -6,8 +6,6 @@ import { prisma } from './prisma'
 export const authOptions: NextAuthOptions = {
     // Force non-secure cookies to fix OAuthSignin on HTTP
     useSecureCookies: false,
-    // Trust the host header, useful when running behind a proxy
-    trustHost: true,
     cookies: {
         sessionToken: {
             name: `next-auth.session-token`,
