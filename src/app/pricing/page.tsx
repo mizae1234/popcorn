@@ -341,7 +341,7 @@ function PricingContent() {
                     </div>
                 </section>
 
-                {/*
+
                 <section className="py-4" style={{ background: '#f8fafc' }}>
                     <div className="container">
                         <div className="card border-0 shadow-sm mx-auto" style={{ maxWidth: '400px', borderRadius: '16px' }}>
@@ -374,7 +374,7 @@ function PricingContent() {
                             </div>
                         </div>
                     </div>
-                </section> */}
+                </section>
 
                 {/* Coin Details */}
                 <section className="py-5 bg-light">
