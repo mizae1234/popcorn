@@ -35,5 +35,9 @@
     "prisma": "^6.8.2",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "https-proxy-agent": "^7.0.5",
+    "http-proxy-agent": "^7.0.2"
   }
 }
