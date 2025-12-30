@@ -10,7 +10,7 @@ COPY package.json package-lock.json ./
 COPY prisma ./prisma/
 
 # Install dependencies
-RUN npm ci --legacy-peer-deps
+RUN npm cache clean --force && npm install --force
 
 # Rebuild the source code only when needed
 FROM base AS builder
