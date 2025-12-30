@@ -4,6 +4,38 @@ import { PrismaAdapter } from '@auth/prisma-adapter'
 import { prisma } from './prisma'
 
 export const authOptions: NextAuthOptions = {
+    // Force non-secure cookies to fix OAuthSignin on HTTP
+    useSecureCookies: false,
+    // Trust the host header, useful when running behind a proxy
+    trustHost: true,
+    cookies: {
+        sessionToken: {
+            name: `next-auth.session-token`,
+            options: {
+                httpOnly: true,
+                sameSite: 'lax',
+                path: '/',
+                secure: false,
+            },
+        },
+        callbackUrl: {
+            name: `next-auth.callback-url`,
+            options: {
+                sameSite: 'lax',
+                path: '/',
+                secure: false,
+            },
+        },
+        csrfToken: {
+            name: `next-auth.csrf-token`,
+            options: {
+                httpOnly: true,
+                sameSite: 'lax',
+                path: '/',
+                secure: false,
+            },
+        },
+    },
     adapter: PrismaAdapter(prisma) as NextAuthOptions['adapter'],
     providers: [
         GoogleProvider({
