@@ -9,6 +9,16 @@ export const authOptions: NextAuthOptions = {
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID!,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+            // Bypass OIDC discovery to avoid listener bug
+            authorization: {
+                url: "https://accounts.google.com/o/oauth2/v2/auth",
+                params: {
+                    scope: "openid email profile",
+                    response_type: "code",
+                }
+            },
+            token: "https://oauth2.googleapis.com/token",
+            userinfo: "https://openidconnect.googleapis.com/v1/userinfo",
         }),
     ],
     session: {
