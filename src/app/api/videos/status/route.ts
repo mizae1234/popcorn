@@ -46,6 +46,9 @@ export async function GET(request: NextRequest) {
         try {
             if (video.provider === 'kie') {
                 // Check status from Kie.ai
+                if (!video.taskId) {
+                    throw new Error('Task ID not found for Kie video')
+                }
                 const kieStatus = await checkKieVideoStatus(video.taskId)
 
                 let status = video.status

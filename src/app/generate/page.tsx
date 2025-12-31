@@ -561,7 +561,8 @@ function GenerateContent() {
 
                                 {/* Generate Button */}
 
-                                <button
+                                {/* Phaya Generate Button (Hidden) */}
+                                {/* <button
                                     type="submit"
                                     className="btn btn-lg w-100 py-3 rounded-pill fw-bold"
                                     disabled={isGenerating || !canGenerate}
@@ -590,10 +591,11 @@ function GenerateContent() {
                                             สร้างวิดีโอ (15 coins)
                                         </>
                                     )}
-                                </button>
+                                </button> */}
 
                                 {/* Kie AI Generate Button */}
-                                <button
+                                {/* Kie AI Generate Button (Hidden) */}
+                                {/* <button
                                     type="button"
                                     onClick={handleGenerateKie}
                                     className="btn btn-lg w-100 py-3 rounded-pill fw-bold mt-3"
@@ -623,7 +625,7 @@ function GenerateContent() {
                                             สร้างวิดีโอ (15 วินาที)
                                         </>
                                     )}
-                                </button>
+                                </button> */}
 
                                 {/* Veo 3.1 AI Generate Button */}
                                 <button
