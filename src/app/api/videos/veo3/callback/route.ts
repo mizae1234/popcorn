@@ -66,19 +66,31 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Video not found' }, { status: 404 })
         }
 
-        // Get video URL - try multiple possible locations
+        // Get video URL - try multiple possible locations with detailed logging
         let videoUrl: string | null = null
 
+        // Debug: log the actual data structure
+        console.log('Debug - payload.data keys:', payload.data ? Object.keys(payload.data) : 'data is null/undefined')
+        console.log('Debug - payload.data.resultUrls:', payload.data?.resultUrls)
+        console.log('Debug - payload.data.result_urls:', payload.data?.result_urls)
+        console.log('Debug - payload.data.response:', payload.data?.response)
+
         // Try official record-info format first (data.response.resultUrls)
-        if (payload.data?.response?.resultUrls?.length) {
+        if (payload.data?.response?.resultUrls && payload.data.response.resultUrls.length > 0) {
             videoUrl = payload.data.response.resultUrls[0]
+            console.log('Found videoUrl in data.response.resultUrls:', videoUrl)
         }
         // Fallback to alternative callback format (data.result_urls or data.resultUrls)
-        else if (payload.data?.result_urls?.length) {
+        else if (payload.data?.result_urls && payload.data.result_urls.length > 0) {
             videoUrl = payload.data.result_urls[0]
+            console.log('Found videoUrl in data.result_urls:', videoUrl)
         }
-        else if (payload.data?.resultUrls?.length) {
+        else if (payload.data?.resultUrls && payload.data.resultUrls.length > 0) {
             videoUrl = payload.data.resultUrls[0]
+            console.log('Found videoUrl in data.resultUrls:', videoUrl)
+        }
+        else {
+            console.log('No videoUrl found in any expected location')
         }
 
         // Determine success based on successFlag or code
@@ -86,7 +98,7 @@ export async function POST(request: NextRequest) {
         const successFlag = payload.data?.successFlag
         const isSuccess = (successFlag === 1) || (payload.code === 200 && videoUrl)
 
-        console.log(`Processing video ${video.id}: successFlag=${successFlag}, code=${payload.code}, hasVideoUrl=${!!videoUrl}`)
+        console.log(`Processing video ${video.id}: successFlag=${successFlag}, code=${payload.code}, hasVideoUrl=${!!videoUrl}, videoUrl=${videoUrl}`)
 
         // Update video based on result
         if (isSuccess && videoUrl) {
