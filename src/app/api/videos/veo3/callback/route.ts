@@ -5,11 +5,14 @@ const COINS_PER_VIDEO = 15
 
 export async function POST(request: NextRequest) {
     try {
-        // Use 'any' to avoid TypeScript type issues with dynamic JSON
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const payload: any = await request.json()
+        // Get raw text first to debug
+        const rawText = await request.text()
+        console.log('Veo3 callback raw text:', rawText)
 
-        console.log('Veo3 callback received:', JSON.stringify(payload, null, 2))
+        // Parse JSON manually
+        const payload = JSON.parse(rawText)
+
+        console.log('Veo3 callback parsed:', JSON.stringify(payload, null, 2))
 
         // Get taskId from either root level or data level
         const taskId = payload.taskId || payload.data?.taskId
@@ -19,7 +22,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
         }
 
-        // Find the video record by taskId (stored as jobId or taskId)
+        // Find the video record by taskId
         const video = await prisma.video.findFirst({
             where: {
                 OR: [
@@ -35,32 +38,53 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Video not found' }, { status: 404 })
         }
 
-        // Get video URL - access data as raw object without TypeScript interference
+        // Get data object
         const data = payload.data || {}
 
-        // Debug: log the full data object to see actual structure
-        console.log('Debug - Full data object:', JSON.stringify(data))
+        // Debug all keys at different levels
+        console.log('Debug - payload keys:', Object.keys(payload))
+        console.log('Debug - data keys:', Object.keys(data))
+        console.log('Debug - data.resultUrls:', data.resultUrls)
+        console.log('Debug - data.result_urls:', data.result_urls)
+        console.log('Debug - data.response:', data.response)
 
+        // Try to find video URL from various locations
         let videoUrl: string | null = null
 
-        // Try all possible locations for video URL
-        if (data.response && data.response.resultUrls && data.response.resultUrls[0]) {
+        // Method 1: data.response.resultUrls (official format)
+        if (data.response && Array.isArray(data.response.resultUrls) && data.response.resultUrls.length > 0) {
             videoUrl = data.response.resultUrls[0]
             console.log('Found videoUrl in data.response.resultUrls:', videoUrl)
         }
-        else if (data.result_urls && data.result_urls[0]) {
+        // Method 2: data.result_urls (callback format)
+        else if (Array.isArray(data.result_urls) && data.result_urls.length > 0) {
             videoUrl = data.result_urls[0]
             console.log('Found videoUrl in data.result_urls:', videoUrl)
         }
-        else if (data.resultUrls && data.resultUrls[0]) {
+        // Method 3: data.resultUrls (alternative callback format)
+        else if (Array.isArray(data.resultUrls) && data.resultUrls.length > 0) {
             videoUrl = data.resultUrls[0]
             console.log('Found videoUrl in data.resultUrls:', videoUrl)
         }
+        // Method 4: Try to extract from raw text using regex as last resort
         else {
-            console.log('No videoUrl found - data keys:', Object.keys(data))
+            console.log('Trying regex extraction from raw text...')
+            const urlMatch = rawText.match(/"result_urls":\s*\[\s*"([^"]+)"/);
+            if (urlMatch && urlMatch[1]) {
+                videoUrl = urlMatch[1]
+                console.log('Found videoUrl via regex:', videoUrl)
+            } else {
+                const urlMatch2 = rawText.match(/"resultUrls":\s*\[\s*"([^"]+)"/);
+                if (urlMatch2 && urlMatch2[1]) {
+                    videoUrl = urlMatch2[1]
+                    console.log('Found videoUrl via regex (resultUrls):', videoUrl)
+                } else {
+                    console.log('No videoUrl found anywhere')
+                }
+            }
         }
 
-        // Determine success
+        // Check success
         const successFlag = data.successFlag
         const isSuccess = (successFlag === 1) || (payload.code === 200 && videoUrl)
 
