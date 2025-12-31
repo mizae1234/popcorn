@@ -38,13 +38,20 @@ export default function VideoCard({
     const [status, setStatus] = useState(initialStatus)
     const [progressState, setProgressState] = useState(initialProgressState)
     const [videoUrl, setVideoUrl] = useState(initialVideoUrl)
+    const [failReason, setFailReason] = useState<string | null>(null)
 
-    // Poll for Kie video status updates
+    // Poll for Kie/Veo3 video status updates
     const checkStatus = useCallback(async () => {
-        if (provider !== 'kie' || status !== 'processing') return
+        // Support both kie and veo3 providers
+        if ((provider !== 'kie' && provider !== 'veo3') || status !== 'processing') return
+
+        // Use appropriate status endpoint based on provider
+        const statusEndpoint = provider === 'veo3'
+            ? '/api/videos/veo3/status'
+            : '/api/videos/kie/status'
 
         try {
-            const res = await fetch('/api/videos/kie/status', {
+            const res = await fetch(statusEndpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ videoId: id }),
@@ -56,6 +63,9 @@ export default function VideoCard({
                     setStatus(data.status)
                     setVideoUrl(data.videoUrl)
                     setProgressState(data.progressState)
+                    if (data.failReason) {
+                        setFailReason(data.failReason)
+                    }
                     if (data.status === 'completed' && onStatusUpdate) {
                         onStatusUpdate()
                     }
@@ -64,12 +74,13 @@ export default function VideoCard({
                 }
             }
         } catch (error) {
-            console.error('Error checking Kie status:', error)
+            console.error(`Error checking ${provider} status:`, error)
         }
     }, [id, provider, status, progressState, onStatusUpdate])
 
     useEffect(() => {
-        if (provider !== 'kie' || status !== 'processing') return
+        // Support both kie and veo3 providers
+        if ((provider !== 'kie' && provider !== 'veo3') || status !== 'processing') return
 
         // Poll every 5 seconds
         const interval = setInterval(checkStatus, 5000)
@@ -79,6 +90,35 @@ export default function VideoCard({
 
         return () => clearInterval(interval)
     }, [provider, status, checkStatus])
+
+    // Fetch failReason for already-failed videos
+    useEffect(() => {
+        if (status !== 'failed' || failReason) return
+        if (provider !== 'kie' && provider !== 'veo3') return
+
+        const fetchFailReason = async () => {
+            const statusEndpoint = provider === 'veo3'
+                ? '/api/videos/veo3/status'
+                : '/api/videos/kie/status'
+
+            try {
+                const res = await fetch(statusEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ videoId: id }),
+                })
+                if (res.ok) {
+                    const data = await res.json()
+                    if (data.failReason) {
+                        setFailReason(data.failReason)
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching fail reason:', error)
+            }
+        }
+        fetchFailReason()
+    }, [id, provider, status, failReason])
 
     // Calculate progress percentage and text based on progressState
     const { progress, progressText } = useMemo(() => {
@@ -234,10 +274,12 @@ export default function VideoCard({
                     </div>
                 ) : (
                     <div className="w-100 h-100 d-flex align-items-center justify-content-center">
-                        <div className="text-center text-white">
+                        <div className="text-center text-white px-3">
                             <i className="bi bi-x-circle fs-1 text-danger mb-3"></i>
                             <p className="fw-medium">การสร้างวิดีโอล้มเหลว</p>
-                            <p className="small opacity-75">กรุณาลองใหม่อีกครั้ง</p>
+                            <p className="small opacity-75" style={{ maxWidth: '280px' }}>
+                                {failReason || 'กรุณาลองใหม่อีกครั้ง'}
+                            </p>
                         </div>
                     </div>
                 )}

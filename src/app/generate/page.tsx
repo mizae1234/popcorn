@@ -49,6 +49,7 @@ function GenerateContent() {
     })
     const [isGenerating, setIsGenerating] = useState(false)
     const [isGeneratingKie, setIsGeneratingKie] = useState(false)
+    const [isGeneratingVeo3, setIsGeneratingVeo3] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [imageError, setImageError] = useState(false)
 
@@ -183,6 +184,52 @@ function GenerateContent() {
             setError(error instanceof Error ? error.message : 'เกิดข้อผิดพลาด')
         } finally {
             setIsGeneratingKie(false)
+        }
+    }
+
+    const handleGenerateVeo3 = async () => {
+        setError(null)
+
+        const coins = session?.user?.coins ?? 0
+        if (coins < 15) {
+            setError('Coins ไม่เพียงพอ กรุณาเติม coins เพื่อสร้างวิดีโอ')
+            return
+        }
+
+        if (!formData.name || !formData.imageUrl || !formData.features) {
+            setError('กรุณากรอกข้อมูลให้ครบถ้วน')
+            return
+        }
+
+        setIsGeneratingVeo3(true)
+
+        try {
+            const res = await fetch('/api/videos/veo3', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: formData.name,
+                    imageUrl: formData.imageUrl,
+                    features: formData.features,
+                    concept: formData.concept,
+                    targetAudience: formData.targetAudience,
+                    caption: formData.caption || undefined,
+                    saveProduct: formData.saveProduct,
+                    productId: productId || undefined,
+                }),
+            })
+
+            if (!res.ok) {
+                const data = await res.json()
+                throw new Error(data.error || 'เกิดข้อผิดพลาดในการสร้างวิดีโอ')
+            }
+
+            const data = await res.json()
+            router.push(`/profile?videoId=${data.video.id}`)
+        } catch (error) {
+            setError(error instanceof Error ? error.message : 'เกิดข้อผิดพลาด')
+        } finally {
+            setIsGeneratingVeo3(false)
         }
     }
 
@@ -513,7 +560,7 @@ function GenerateContent() {
                                 </div>
 
                                 {/* Generate Button */}
-                                {/*
+
                                 <button
                                     type="submit"
                                     className="btn btn-lg w-100 py-3 rounded-pill fw-bold"
@@ -544,7 +591,7 @@ function GenerateContent() {
                                         </>
                                     )}
                                 </button>
-                                     */}
+
                                 {/* Kie AI Generate Button */}
                                 <button
                                     type="button"
@@ -574,6 +621,39 @@ function GenerateContent() {
                                         <>
                                             <i className="bi bi-stars me-2"></i>
                                             สร้างวิดีโอ (15 วินาที)
+                                        </>
+                                    )}
+                                </button>
+
+                                {/* Veo 3.1 AI Generate Button */}
+                                <button
+                                    type="button"
+                                    onClick={handleGenerateVeo3}
+                                    className="btn btn-lg w-100 py-3 rounded-pill fw-bold mt-3"
+                                    disabled={isGeneratingVeo3 || !canGenerate}
+                                    style={{
+                                        background: canGenerate
+                                            ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)'
+                                            : '#9ca3af',
+                                        border: 'none',
+                                        color: 'white',
+                                        boxShadow: canGenerate ? '0 10px 30px rgba(16, 185, 129, 0.3)' : 'none',
+                                    }}
+                                >
+                                    {isGeneratingVeo3 ? (
+                                        <>
+                                            <span className="spinner-border spinner-border-sm me-2"></span>
+                                            กำลังสร้างวิดีโอ Veo3...
+                                        </>
+                                    ) : !canGenerate ? (
+                                        <>
+                                            <i className="bi bi-exclamation-circle me-2"></i>
+                                            Coins ไม่เพียงพอ
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="bi bi-play-circle me-2"></i>
+                                            สร้างวิดีโอ Veo 3.1 (15 coins)
                                         </>
                                     )}
                                 </button>

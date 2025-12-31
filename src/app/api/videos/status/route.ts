@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { checkVideoStatus } from '@/lib/phaya'
+import { checkVideoStatus as checkPhayaStatus } from '@/lib/phaya'
+import { checkKieVideoStatus, parseKieResultJson } from '@/lib/kie'
+
+const COINS_PER_VIDEO = 15
 
 export async function GET(request: NextRequest) {
     try {
@@ -39,47 +42,100 @@ export async function GET(request: NextRequest) {
             })
         }
 
-        // Check status from Phaya.io
+        // Check status based on provider
         try {
-            const phayaStatus = await checkVideoStatus(video.jobId)
+            if (video.provider === 'kie') {
+                // Check status from Kie.ai
+                const kieStatus = await checkKieVideoStatus(video.taskId)
 
-            // Update video in database if status changed
-            if (phayaStatus.status !== video.status) {
-                const isFailure = phayaStatus.status === 'failed'
+                let status = video.status
+                let videoUrl: string | null = null
 
-                // Handle Refund if failed
-                if (isFailure) {
-                    const COINS_PER_VIDEO = 15 // Should match route.ts
-                    await prisma.user.update({
-                        where: { id: session.user.id },
-                        data: { coins: { increment: COINS_PER_VIDEO } },
-                    })
+                // Map Kie states to our statuses
+                if (kieStatus.data.state === 'success') {
+                    status = 'completed'
+                    const parsed = parseKieResultJson(kieStatus.data.resultJson)
+                    videoUrl = parsed.videoUrl
+                } else if (kieStatus.data.state === 'fail') {
+                    status = 'failed'
+                } else {
+                    status = 'processing' // waiting, queuing, generating
+                }
 
-                    await prisma.transaction.create({
+                // Update video in database if status changed
+                if (status !== video.status || videoUrl !== video.videoUrl) {
+                    // Handle Refund if failed
+                    if (status === 'failed') {
+                        await prisma.user.update({
+                            where: { id: session.user.id },
+                            data: { coins: { increment: COINS_PER_VIDEO } },
+                        })
+
+                        await prisma.transaction.create({
+                            data: {
+                                userId: session.user.id,
+                                type: 'refund',
+                                amount: COINS_PER_VIDEO,
+                                description: `Refund: Video generation failed (Kie)`,
+                            },
+                        })
+                    }
+
+                    await prisma.video.update({
+                        where: { id: videoId },
                         data: {
-                            userId: session.user.id,
-                            type: 'refund',
-                            amount: COINS_PER_VIDEO,
-                            description: `Refund: Video generation failed`,
+                            status,
+                            videoUrl,
                         },
                     })
                 }
 
-                await prisma.video.update({
-                    where: { id: videoId },
-                    data: {
-                        status: phayaStatus.status,
-                        videoUrl: phayaStatus.video_url || null,
-                    },
+                return NextResponse.json({
+                    status,
+                    videoUrl,
+                    kieState: kieStatus.data.state,
+                })
+            } else {
+                // Default to Phaya.io
+                const phayaStatus = await checkPhayaStatus(video.jobId)
+
+                // Update video in database if status changed
+                if (phayaStatus.status !== video.status) {
+                    const isFailure = phayaStatus.status === 'failed'
+
+                    // Handle Refund if failed
+                    if (isFailure) {
+                        await prisma.user.update({
+                            where: { id: session.user.id },
+                            data: { coins: { increment: COINS_PER_VIDEO } },
+                        })
+
+                        await prisma.transaction.create({
+                            data: {
+                                userId: session.user.id,
+                                type: 'refund',
+                                amount: COINS_PER_VIDEO,
+                                description: `Refund: Video generation failed`,
+                            },
+                        })
+                    }
+
+                    await prisma.video.update({
+                        where: { id: videoId },
+                        data: {
+                            status: phayaStatus.status,
+                            videoUrl: phayaStatus.video_url || null,
+                        },
+                    })
+                }
+
+                return NextResponse.json({
+                    status: phayaStatus.status,
+                    videoUrl: phayaStatus.video_url,
                 })
             }
-
-            return NextResponse.json({
-                status: phayaStatus.status,
-                videoUrl: phayaStatus.video_url,
-            })
         } catch (apiError) {
-            console.error('Error checking Phaya.io status:', apiError)
+            console.error('Error checking video status:', apiError)
             // Return current database status if API fails
             return NextResponse.json({
                 status: video.status,

@@ -7,11 +7,9 @@ import { useState, useEffect, Suspense } from 'react'
 import Footer from '@/components/Footer'
 
 const PRICE_PLANS = [
-    // { id: 'mini_20', name: 'Mini Pack', price: 20, coins: 20 },
-    // { id: 'topup_100', name: 'Top-up 100', price: 99, coins: 100 },
-    { id: 'monthly_250', name: 'Monthly Plan', price: 199, coins: 250 },
-    { id: 'pro_450', name: 'Pro Plan', price: 299, coins: 450 },
-    { id: 'topup_500', name: 'Top-up 500', price: 399, coins: 500 },
+    { id: 'entry_120', name: 'Entry Plan', price: 149, coins: 120 },
+    { id: 'pro_300', name: 'Pro Plan', price: 299, coins: 300 },
+    { id: 'power_600', name: 'Power Plan', price: 499, coins: 600 },
 ]
 
 function PricingContent() {
@@ -113,7 +111,7 @@ function PricingContent() {
                             ราคาที่คุ้มค่าสำหรับทุกคน
                         </h1>
                         <p className="lead text-white-50 mb-0">
-                            เริ่มต้นฟรี 50 coins • ใช้ 15 coins ต่อวิดีโอ
+                            เริ่มต้นฟรี 40 coins • ใช้ 15 coins ต่อวิดีโอ
                         </p>
                         {session && (
                             <div className="mt-4 d-inline-flex align-items-center gap-2 px-4 py-2 rounded-pill" style={{
@@ -131,7 +129,7 @@ function PricingContent() {
                     <div className="container">
                         <div className="row justify-content-center g-4">
                             {/* Free Tier */}
-                            <div className="col-md-6 col-lg-5 col-xl-4">
+                            <div className="col-md-6 col-lg-3">
                                 <div className="card h-100 border-0 shadow-sm" style={{ borderRadius: '24px' }}>
                                     <div className="card-body p-4 p-lg-5">
                                         <div className="text-center mb-4">
@@ -149,7 +147,7 @@ function PricingContent() {
                                         <div className="text-center mb-4 p-3 rounded-3 bg-light">
                                             <div className="d-flex align-items-center justify-content-center gap-2">
                                                 <span style={{ fontSize: '2rem' }}>🪙</span>
-                                                <span className="fs-3 fw-bold text-success">50 Coins</span>
+                                                <span className="fs-3 fw-bold text-success">40 Coins</span>
                                             </div>
                                             <small className="text-muted">ได้รับทันทีเมื่อสมัคร</small>
                                         </div>
@@ -191,8 +189,64 @@ function PricingContent() {
                                 </div>
                             </div>
 
-                            {/* Monthly Plan */}
-                            <div className="col-md-6 col-lg-5 col-xl-4">
+                            {/* Entry Plan */}
+                            <div className="col-md-6 col-lg-3">
+                                <div className="card h-100 border-0 shadow-sm" style={{ borderRadius: '24px' }}>
+                                    <div className="card-body p-4 p-lg-5">
+                                        <div className="text-center mb-4">
+                                            <span className="badge bg-info rounded-pill px-3 py-2 mb-3">
+                                                💡 ทดลอง
+                                            </span>
+                                            <h3 className="fw-bold">Entry Plan</h3>
+                                            <p className="text-muted mb-0">สำหรับทดลองใช้งาน</p>
+                                        </div>
+
+                                        <div className="text-center mb-4">
+                                            <span className="display-3 fw-bold text-info">฿149</span>
+                                        </div>
+
+                                        <div className="text-center mb-4 p-3 rounded-3 bg-light">
+                                            <div className="d-flex align-items-center justify-content-center gap-2">
+                                                <span style={{ fontSize: '2rem' }}>🪙</span>
+                                                <span className="fs-3 fw-bold text-info">120 Coins</span>
+                                            </div>
+                                            <small className="text-muted">สร้างได้ ~8 วิดีโอ</small>
+                                        </div>
+
+                                        <ul className="list-unstyled mb-4">
+                                            {[
+                                                'วิดีโอคุณภาพ HD',
+                                                'ดาวน์โหลดได้ไม่จำกัด',
+                                                'Regenerate ได้หากไม่พอใจ',
+                                                'เก็บวิดีโอย้อนหลังได้',
+                                            ].map((feature, index) => (
+                                                <li key={index} className="d-flex align-items-center gap-2 mb-3">
+                                                    <span className="text-info">✓</span>
+                                                    {feature}
+                                                </li>
+                                            ))}
+                                        </ul>
+
+                                        <button
+                                            onClick={() => handleCheckout('entry_120')}
+                                            disabled={isCheckingOut === 'entry_120'}
+                                            className="btn btn-info btn-lg w-100 py-3 rounded-pill fw-bold text-white"
+                                        >
+                                            {isCheckingOut === 'entry_120' ? (
+                                                <>
+                                                    <span className="spinner-border spinner-border-sm me-2"></span>
+                                                    กำลังดำเนินการ...
+                                                </>
+                                            ) : (
+                                                'เลือกแพ็กเกจนี้'
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Pro Plan */}
+                            <div className="col-md-6 col-lg-3">
                                 <div className="card h-100 border-0 shadow-lg position-relative" style={{
                                     borderRadius: '24px',
                                     background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
@@ -205,13 +259,12 @@ function PricingContent() {
                                     </div>
                                     <div className="card-body p-4 p-lg-5 text-white">
                                         <div className="text-center mb-4 mt-2">
-                                            <h3 className="fw-bold">Monthly Plan</h3>
-                                            <p className="text-white-50 mb-0">เหมาะสำหรับ TikTok Creator</p>
+                                            <h3 className="fw-bold">Pro Plan</h3>
+                                            <p className="text-white-50 mb-0">สำหรับใช้งานจริง</p>
                                         </div>
 
                                         <div className="text-center mb-4">
-                                            <span className="display-3 fw-bold text-warning">฿199</span>
-                                            <span className="text-white-50">/เดือน</span>
+                                            <span className="display-3 fw-bold text-warning">฿299</span>
                                         </div>
 
                                         <div className="text-center mb-4 p-3 rounded-3" style={{
@@ -220,19 +273,18 @@ function PricingContent() {
                                         }}>
                                             <div className="d-flex align-items-center justify-content-center gap-2">
                                                 <span style={{ fontSize: '2rem' }}>🪙</span>
-                                                <span className="fs-3 fw-bold text-warning">250 Coins</span>
+                                                <span className="fs-3 fw-bold text-warning">300 Coins</span>
                                             </div>
-                                            <small className="text-white-50">ใช้ได้ภายใน 1 เดือน</small>
+                                            <small className="text-white-50">สร้างได้ ~20 วิดีโอ</small>
                                         </div>
 
                                         <ul className="list-unstyled mb-4">
                                             {[
-
                                                 'วิดีโอคุณภาพ HD',
                                                 'ดาวน์โหลดได้ไม่จำกัด',
                                                 'Regenerate ได้หากไม่พอใจ',
                                                 'เก็บวิดีโอย้อนหลังได้',
-                                                'เติม Coins เพิ่มได้',
+                                                'คุ้มค่ามากขึ้น!',
                                             ].map((feature, index) => (
                                                 <li key={index} className="d-flex align-items-center gap-2 mb-3">
                                                     <span className="text-warning">✓</span>
@@ -242,8 +294,8 @@ function PricingContent() {
                                         </ul>
 
                                         <button
-                                            onClick={() => handleCheckout('monthly_250')}
-                                            disabled={isCheckingOut === 'monthly_250'}
+                                            onClick={() => handleCheckout('pro_300')}
+                                            disabled={isCheckingOut === 'pro_300'}
                                             className="btn btn-lg w-100 py-3 rounded-pill fw-bold"
                                             style={{
                                                 background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
@@ -252,21 +304,21 @@ function PricingContent() {
                                                 boxShadow: '0 10px 30px rgba(251, 191, 36, 0.4)',
                                             }}
                                         >
-                                            {isCheckingOut === 'monthly_250' ? (
+                                            {isCheckingOut === 'pro_300' ? (
                                                 <>
                                                     <span className="spinner-border spinner-border-sm me-2"></span>
                                                     กำลังดำเนินการ...
                                                 </>
                                             ) : (
-                                                'สมัครสมาชิก'
+                                                'เลือกแพ็กเกจนี้'
                                             )}
                                         </button>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Pro Plan */}
-                            <div className="col-md-6 col-lg-5 col-xl-4">
+                            {/* Power Plan */}
+                            <div className="col-md-6 col-lg-3">
                                 <div className="card h-100 border-0 shadow-lg position-relative" style={{
                                     borderRadius: '24px',
                                     background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
@@ -278,13 +330,12 @@ function PricingContent() {
                                     </div>
                                     <div className="card-body p-4 p-lg-5 text-white">
                                         <div className="text-center mb-4 mt-2">
-                                            <h3 className="fw-bold">Pro Plan</h3>
-                                            <p className="text-white-50 mb-0">สำหรับ Creator มืออาชีพ</p>
+                                            <h3 className="fw-bold">Power Plan</h3>
+                                            <p className="text-white-50 mb-0">สำหรับใช้ต่อเนื่อง</p>
                                         </div>
 
                                         <div className="text-center mb-4">
-                                            <span className="display-3 fw-bold" style={{ color: '#fcd34d' }}>฿299</span>
-                                            <span className="text-white-50">/เดือน</span>
+                                            <span className="display-3 fw-bold" style={{ color: '#fcd34d' }}>฿499</span>
                                         </div>
 
                                         <div className="text-center mb-4 p-3 rounded-3" style={{
@@ -293,19 +344,18 @@ function PricingContent() {
                                         }}>
                                             <div className="d-flex align-items-center justify-content-center gap-2">
                                                 <span style={{ fontSize: '2rem' }}>🪙</span>
-                                                <span className="fs-3 fw-bold" style={{ color: '#fcd34d' }}>450 Coins</span>
+                                                <span className="fs-3 fw-bold" style={{ color: '#fcd34d' }}>600 Coins</span>
                                             </div>
-                                            <small className="text-white-50">ใช้ได้ภายใน 1 เดือน</small>
+                                            <small className="text-white-50">สร้างได้ ~40 วิดีโอ</small>
                                         </div>
 
                                         <ul className="list-unstyled mb-4">
                                             {[
-                                                // 'สร้างวิดีโอได้ ~30 ครั้ง',
                                                 'วิดีโอคุณภาพ HD',
                                                 'ดาวน์โหลดได้ไม่จำกัด',
                                                 'Regenerate ได้หากไม่พอใจ',
                                                 'เก็บวิดีโอย้อนหลังได้',
-                                                'เติม Coins เพิ่มได้',
+                                                'คุ้มค่าที่สุด!',
                                             ].map((feature, index) => (
                                                 <li key={index} className="d-flex align-items-center gap-2 mb-3">
                                                     <span style={{ color: '#fcd34d' }}>✓</span>
@@ -315,8 +365,8 @@ function PricingContent() {
                                         </ul>
 
                                         <button
-                                            onClick={() => handleCheckout('pro_450')}
-                                            disabled={isCheckingOut === 'pro_450'}
+                                            onClick={() => handleCheckout('power_600')}
+                                            disabled={isCheckingOut === 'power_600'}
                                             className="btn btn-lg w-100 py-3 rounded-pill fw-bold"
                                             style={{
                                                 background: 'linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%)',
@@ -325,13 +375,13 @@ function PricingContent() {
                                                 boxShadow: '0 10px 30px rgba(252, 211, 77, 0.4)',
                                             }}
                                         >
-                                            {isCheckingOut === 'pro_450' ? (
+                                            {isCheckingOut === 'power_600' ? (
                                                 <>
                                                     <span className="spinner-border spinner-border-sm me-2"></span>
                                                     กำลังดำเนินการ...
                                                 </>
                                             ) : (
-                                                'สมัครสมาชิก Pro'
+                                                'เลือกแพ็กเกจนี้'
                                             )}
                                         </button>
                                     </div>
@@ -389,7 +439,7 @@ function PricingContent() {
                                 {
                                     icon: '🪙',
                                     title: 'Coin คืออะไร?',
-                                    description: 'Coin เป็นหน่วยเครดิตที่ใช้ในการสร้างวิดีโอ คุณจะได้รับ 50 Coins ฟรีเมื่อสมัครใช้งาน',
+                                    description: 'Coin เป็นหน่วยเครดิตที่ใช้ในการสร้างวิดีโอ คุณจะได้รับ 40 Coins ฟรีเมื่อสมัครใช้งาน',
                                 },
                                 {
                                     icon: '⏱️',
@@ -433,8 +483,8 @@ function PricingContent() {
                                 <div className="accordion" id="faqAccordion">
                                     {[
                                         {
-                                            q: 'สมัครสมาชิกแล้วได้อะไรบ้าง?',
-                                            a: 'เมื่อสมัครแพ็กเกจ Monthly Plan (199 บาท/เดือน) คุณจะได้รับ 250 Coins ซึ่งสามารถใช้สร้างวิดีโอได้ประมาณ 16 ครั้ง (15 Coins/วิดีโอ)',
+                                            q: 'สมัครแพ็กเกจแล้วได้อะไรบ้าง?',
+                                            a: 'Entry Plan (149 บาท) ได้ 120 Coins สร้างได้ ~8 วิดีโอ, Pro Plan (299 บาท) ได้ 300 Coins สร้างได้ ~20 วิดีโอ, Power Plan (499 บาท) ได้ 600 Coins สร้างได้ ~40 วิดีโอ (15 Coins/วิดีโอ)',
                                         },
                                         {
                                             q: 'Coins หมดอายุเมื่อไหร่?',
@@ -486,7 +536,7 @@ function PricingContent() {
                             พร้อมเริ่มต้นสร้างวิดีโอแล้วหรือยัง?
                         </h2>
                         <p className="text-white-50 mb-4">
-                            เริ่มต้นฟรี 50 coins วันนี้!
+                            เริ่มต้นฟรี 40 coins วันนี้!
                         </p>
                         {session ? (
                             <Link

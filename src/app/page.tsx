@@ -171,13 +171,13 @@ export default function HomePage() {
               <span className="gradient-text">ทุกคน</span>
             </h2>
             <p className="lead text-muted">
-              เริ่มต้นฟรี 50 coins • ใช้ 15 coins ต่อวิดีโอ
+              เริ่มต้นฟรี 40 coins • ใช้ 15 coins ต่อวิดีโอ
             </p>
           </div>
 
           <div className="row justify-content-center g-4">
             {/* Free tier */}
-            <div className="col-md-6 col-lg-4">
+            <div className="col-md-6 col-lg-3">
               <div className="card h-100 border-0 shadow-sm" style={{ borderRadius: '24px' }}>
                 <div className="card-body p-4 p-lg-5">
                   <div className="text-center mb-4">
@@ -189,17 +189,15 @@ export default function HomePage() {
                     <span className="display-4 fw-bold text-success">ฟรี</span>
                   </div>
 
-                  <div className="text-center mb-4 p-3 rounded-3 bg-light">
-                    <div className="d-flex align-items-center justify-content-center gap-2">
-                      <span style={{ fontSize: '1.5rem' }}>🪙</span>
-                      <span className="fs-4 fw-bold text-success">50 Coins</span>
-                    </div>
-                    <small className="text-muted">สร้างวิดีโอได้ ~3 ครั้ง</small>
+                  <div className="d-flex align-items-center justify-content-center gap-2">
+                    <span style={{ fontSize: '1.5rem' }}>🪙</span>
+                    <span className="fs-4 fw-bold text-success">40 Coins</span>
                   </div>
+                  <small className="text-muted">สร้างวิดีโอได้ ~2 ครั้ง</small>
 
                   <ul className="list-unstyled mb-4">
                     {[
-                      'สร้างวิดีโอได้ ~3 ครั้ง',
+                      'สร้างวิดีโอได้ ~2 ครั้ง',
                       'วิดีโอคุณภาพ HD',
                       'ดาวน์โหลดได้',
                     ].map((feature, index) => (
@@ -220,13 +218,78 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Premium tier */}
-            <div className="col-md-6 col-lg-4">
-              <PricingCard recommended />
+            {/* Entry tier */}
+            <div className="col-md-6 col-lg-3">
+              <PricingCard />
             </div>
 
             {/* Pro Plan */}
-            <div className="col-md-6 col-lg-4">
+            <div className="col-md-6 col-lg-3">
+              <div className="card h-100 border-0 shadow-lg position-relative" style={{
+                borderRadius: '24px',
+                background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
+                transform: 'scale(1.02)',
+                zIndex: 1,
+              }}>
+                <div className="position-absolute top-0 start-50 translate-middle">
+                  <span className="badge bg-warning text-dark px-4 py-2 fs-6 rounded-pill shadow">
+                    🌟 แนะนำ
+                  </span>
+                </div>
+                <div className="card-body p-4 p-lg-5 text-white">
+                  <div className="text-center mb-4 mt-2">
+                    <h3 className="fw-bold">Pro Plan</h3>
+                    <p className="text-white-50 mb-0">สำหรับใช้งานจริง</p>
+                  </div>
+
+                  <div className="text-center mb-4">
+                    <span className="display-4 fw-bold text-warning">฿299</span>
+                  </div>
+
+                  <div className="text-center mb-4 p-3 rounded-3" style={{
+                    background: 'rgba(251, 191, 36, 0.2)',
+                    border: '1px solid rgba(251, 191, 36, 0.3)',
+                  }}>
+                    <div className="d-flex align-items-center justify-content-center gap-2">
+                      <span style={{ fontSize: '2rem' }}>🪙</span>
+                      <span className="fs-3 fw-bold text-warning">300 Coins</span>
+                    </div>
+                    <small className="text-white-50">สร้างได้ ~20 วิดีโอ</small>
+                  </div>
+
+                  <ul className="list-unstyled mb-4">
+                    {[
+                      'วิดีโอคุณภาพ HD',
+                      'ดาวน์โหลดได้ไม่จำกัด',
+                      'Regenerate ได้หากไม่พอใจ',
+                      'เก็บวิดีโอย้อนหลังได้',
+                      'คุ้มค่ามากขึ้น!',
+                    ].map((feature, index) => (
+                      <li key={index} className="d-flex align-items-center gap-2 mb-3">
+                        <span className="text-warning">✓</span>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Link
+                    href="/pricing"
+                    className="btn btn-lg w-100 py-3 rounded-pill fw-bold"
+                    style={{
+                      background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
+                      border: 'none',
+                      color: '#1e3a8a',
+                      boxShadow: '0 10px 30px rgba(251, 191, 36, 0.4)',
+                    }}
+                  >
+                    เลือกแพ็กเกจนี้
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Power Plan */}
+            <div className="col-md-6 col-lg-3">
               <div className="card h-100 border-0 shadow-lg position-relative" style={{
                 borderRadius: '24px',
                 background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
@@ -238,12 +301,12 @@ export default function HomePage() {
                 </div>
                 <div className="card-body p-4 p-lg-5 text-white">
                   <div className="text-center mb-4 mt-2">
-                    <h3 className="fw-bold">Pro Plan</h3>
-                    <p className="text-white-50 mb-0">สำหรับ Creator มืออาชีพ</p>
+                    <h3 className="fw-bold">Power Plan</h3>
+                    <p className="text-white-50 mb-0">สำหรับใช้ต่อเนื่อง</p>
                   </div>
 
                   <div className="text-center mb-4">
-                    <span className="display-3 fw-bold" style={{ color: '#fcd34d' }}>฿299</span>
+                    <span className="display-4 fw-bold" style={{ color: '#fcd34d' }}>฿499</span>
                     <span className="text-white-50">/เดือน</span>
                   </div>
 
@@ -253,9 +316,9 @@ export default function HomePage() {
                   }}>
                     <div className="d-flex align-items-center justify-content-center gap-2">
                       <span style={{ fontSize: '2rem' }}>🪙</span>
-                      <span className="fs-3 fw-bold" style={{ color: '#fcd34d' }}>450 Coins</span>
+                      <span className="fs-3 fw-bold" style={{ color: '#fcd34d' }}>600 Coins</span>
                     </div>
-                    <small className="text-white-50">ใช้ได้ภายใน 1 เดือน</small>
+                    <small className="text-white-50">สร้างได้ ~40 วิดีโอ</small>
                   </div>
 
                   <ul className="list-unstyled mb-4">
@@ -264,7 +327,7 @@ export default function HomePage() {
                       'ดาวน์โหลดได้ไม่จำกัด',
                       'Regenerate ได้หากไม่พอใจ',
                       'เก็บวิดีโอย้อนหลังได้',
-                      'เติม Coins เพิ่มได้',
+                      'คุ้มค่าที่สุด!',
                     ].map((feature, index) => (
                       <li key={index} className="d-flex align-items-center gap-2 mb-3">
                         <span style={{ color: '#fcd34d' }}>✓</span>
@@ -283,7 +346,7 @@ export default function HomePage() {
                       boxShadow: '0 10px 30px rgba(252, 211, 77, 0.4)',
                     }}
                   >
-                    สมัครสมาชิก Pro
+                    เลือกแพ็กเกจนี้
                   </Link>
                 </div>
               </div>
@@ -301,7 +364,7 @@ export default function HomePage() {
             พร้อมสร้างวิดีโอ TikTok แล้วหรือยัง?
           </h2>
           <p className="lead text-white-50 mb-4">
-            เริ่มต้นฟรี 50 coins วันนี้ • ไม่ต้องใช้บัตรเครดิต
+            เริ่มต้นฟรี 40 coins วันนี้ • ไม่ต้องใช้บัตรเครดิต
           </p>
           <div className="d-flex gap-3 justify-content-center flex-wrap">
             <Link

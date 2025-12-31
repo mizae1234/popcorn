@@ -14,39 +14,32 @@ export interface PricePlan {
 
 export const PRICE_PLANS: PricePlan[] = [
     {
+        id: 'entry_120',
+        name: 'Entry Plan',
+        price: 149,
+        coins: 120,
+        description: '120 Coins - สร้างวิดีโอได้ ~8 ครั้ง',
+    },
+    {
+        id: 'pro_300',
+        name: 'Pro Plan',
+        price: 299,
+        coins: 300,
+        description: '300 Coins - สร้างวิดีโอได้ ~20 ครั้ง',
+    },
+    {
+        id: 'power_600',
+        name: 'Power Plan',
+        price: 499,
+        coins: 600,
+        description: '600 Coins - สร้างวิดีโอได้ ~40 ครั้ง',
+    },
+    {
         id: 'mini_20',
         name: 'Mini Pack',
         price: 20,
         coins: 20,
         description: '20 Coins - สร้างวิดีโอได้ 1 ครั้ง',
-    },
-    {
-        id: 'topup_100',
-        name: 'Top-up 100 Coins',
-        price: 99,
-        coins: 100,
-        description: '100 Coins - สร้างวิดีโอได้ ~6 ครั้ง',
-    },
-    {
-        id: 'monthly_250',
-        name: 'Monthly Plan',
-        price: 199,
-        coins: 250,
-        description: '250 Coins - สร้างวิดีโอได้ ~16 ครั้ง',
-    },
-    {
-        id: 'pro_450',
-        name: 'Pro Plan',
-        price: 299,
-        coins: 450,
-        description: '450 Coins - สร้างวิดีโอได้ ~30 ครั้ง',
-    },
-    {
-        id: 'topup_500',
-        name: 'Top-up 500 Coins',
-        price: 399,
-        coins: 500,
-        description: '500 Coins - สร้างวิดีโอได้ ~33 ครั้ง',
     },
 ]
 

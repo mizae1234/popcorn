@@ -166,7 +166,7 @@ export default function Hero() {
                         {/* Stats */}
                         <div className="d-flex gap-4 mt-5 justify-content-center justify-content-lg-start">
                             <div>
-                                <div className="fw-bold fs-4 text-white">50+</div>
+                                <div className="fw-bold fs-4 text-white">40+</div>
                                 <small className="text-white-50">Coins ฟรี</small>
                             </div>
                             <div className="vr bg-white-25"></div>
@@ -176,7 +176,7 @@ export default function Hero() {
                             </div>
                             <div className="vr bg-white-25"></div>
                             <div>
-                                <div className="fw-bold fs-4 text-white">199฿</div>
+                                <div className="fw-bold fs-4 text-white">149฿</div>
                                 <small className="text-white-50">ต่อเดือน</small>
                             </div>
                         </div>

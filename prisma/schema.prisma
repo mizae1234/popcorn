@@ -53,7 +53,7 @@ model User {
   image         String?
   emailVerified DateTime?
   
-  coins         Int       @default(50)
+  coins         Int       @default(40)
   coinsExpireAt DateTime?
   
   accounts      Account[]
@@ -95,6 +95,7 @@ model Video {
   aspectRatio String   @default("portrait") // for TikTok
   provider      String   @default("phaya") // phaya or kie
   progressState String?  // waiting, queuing, generating (for progress bar)
+  failReason    String?  @db.Text // User-friendly error message when failed
   caption       String?  @db.Text // Caption for TikTok post
   
   productId   String?

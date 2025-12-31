@@ -32,18 +32,18 @@ export default function PricingCard({ recommended = false }: PricingCardProps) {
             <div className="card-body p-4 p-lg-5">
                 <div className="text-center mb-4">
                     <h3 className={`fw-bold ${recommended ? 'text-white' : 'text-dark'}`}>
-                        Monthly Plan
+                        Entry Plan
                     </h3>
                     <p className={recommended ? 'text-white-50' : 'text-muted'}>
-                        เหมาะสำหรับ TikTok Creator
+                        สำหรับทดลองใช้งาน
                     </p>
                 </div>
 
                 <div className="text-center mb-4">
                     <span className={`display-4 fw-bold ${recommended ? 'text-warning' : 'text-primary'}`}>
-                        ฿199
+                        ฿149
                     </span>
-                    <span className={recommended ? 'text-white-50' : 'text-muted'}>/เดือน</span>
+                    <span className={recommended ? 'text-white-50' : 'text-muted'}></span>
                 </div>
 
                 {/* Coin highlight */}
@@ -56,11 +56,11 @@ export default function PricingCard({ recommended = false }: PricingCardProps) {
                     <div className="d-flex align-items-center justify-content-center gap-2">
                         <span style={{ fontSize: '2rem' }}>🪙</span>
                         <span className={`fs-3 fw-bold ${recommended ? 'text-warning' : 'text-warning'}`}>
-                            250 Coins
+                            120 Coins
                         </span>
                     </div>
                     <small className={recommended ? 'text-white-50' : 'text-muted'}>
-                        ใช้ได้ภายใน 1 เดือน
+                        สร้างได้ ~8 วิดีโอ
                     </small>
                 </div>
 

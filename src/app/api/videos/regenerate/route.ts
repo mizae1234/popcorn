@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { generateVideo } from '@/lib/phaya'
+import { generateVideoWithVeo3 } from '@/lib/kie'
 
 const COINS_PER_VIDEO = 15
 
@@ -59,20 +59,27 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // Call Phaya.io API
-        const phayaResponse = await generateVideo({
+        // Get callback URL for Veo3 webhook
+        const baseUrl = process.env.NEXTAUTH_URL || 'https://popcorn.icare-life.com'
+        const callbackUrl = `${baseUrl}/api/videos/veo3/callback`
+
+        // Call Veo3 API instead of Kie
+        const veo3Response = await generateVideoWithVeo3({
             prompt: originalVideo.prompt,
             imageUrls: [imageUrl],
-            aspectRatio: 'portrait',
-            nFrames: '10',
-            removeWatermark: true,
+            aspectRatio: '9:16',
+            model: 'veo3_fast',
+            callbackUrl,
+            generationType: 'FIRST_AND_LAST_FRAMES_2_VIDEO',
         })
 
-        // Create new video record
+        // Create new video record with Veo3 task ID
         const newVideo = await prisma.video.create({
             data: {
-                jobId: phayaResponse.job_id,
-                taskId: phayaResponse.task_id,
+                jobId: veo3Response.data.taskId,
+                taskId: veo3Response.data.taskId,
+                provider: 'veo3',
+                progressState: 'waiting',
                 status: 'processing',
                 prompt: originalVideo.prompt,
                 caption: originalVideo.caption,
@@ -94,7 +101,7 @@ export async function POST(request: NextRequest) {
                 userId: session.user.id,
                 type: 'generation',
                 amount: -COINS_PER_VIDEO,
-                description: `Regenerate วิดีโอ`,
+                description: `Regenerate วิดีโอ (Veo3)`,
             },
         })
 
