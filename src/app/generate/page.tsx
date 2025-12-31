@@ -655,7 +655,7 @@ function GenerateContent() {
                                     ) : (
                                         <>
                                             <i className="bi bi-play-circle me-2"></i>
-                                            สร้างวิดีโอ Veo 3.1 (15 coins)
+                                            สร้างวิดีโอ(15 coins)
                                         </>
                                     )}
                                 </button>
