@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Get callback URL for Veo3 webhook
-        const baseUrl = process.env.NEXTAUTH_URL || 'https://popcorn.icare-life.com'
+        const baseUrl = process.env.NEXTAUTH_URL || 'https://popcorn-creator.com'
         const callbackUrl = `${baseUrl}/api/videos/veo3/callback`
 
         // Call Veo3 API instead of Kie
