@@ -1,25 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { parseVeo3ResultJson, Veo3VideoStatusResponse } from '@/lib/kie'
 
+const COINS_PER_VIDEO = 15
+
+// Veo3 callback payload structure - supporting both callback and record-info formats
 interface Veo3CallbackPayload {
     code: number
     msg: string
     data: {
-        taskId: string
-        paramJson: string
-        completeTime: string
-        response: {
-            taskId: string
-            resultUrls: string[]
-            originUrls: string[]
-            resolution: string
+        taskId?: string
+        paramJson?: string
+        completeTime?: string
+        response?: {
+            taskId?: string
+            resultUrls?: string[]
+            originUrls?: string[]
+            resolution?: string
         }
-        successFlag: number
-        errorCode: string | null
-        errorMessage: string
-        createTime: string
+        successFlag?: number  // 0=Generating, 1=Success, 2=Failed, 3=Generation Failed
+        errorCode?: number | null
+        errorMessage?: string | null
+        createTime?: string
+        fallbackFlag?: boolean
+        // Alternative callback format fields
+        info?: {
+            has_audio_list?: boolean[]
+        }
+        media_ids?: string[]
+        resolution?: string
+        resultUrls?: string[]
+        result_urls?: string[]
+        seeds?: number[]
     }
+    // Some callbacks have taskId at root level
+    taskId?: string
 }
 
 export async function POST(request: NextRequest) {
@@ -28,33 +42,54 @@ export async function POST(request: NextRequest) {
 
         console.log('Veo3 callback received:', JSON.stringify(payload, null, 2))
 
-        const { data } = payload
+        // Get taskId from either root level or data level
+        const taskId = payload.taskId || payload.data?.taskId
 
-        if (!data?.taskId) {
+        if (!taskId) {
             console.error('Invalid callback payload: missing taskId')
             return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
         }
 
-        // Find the video record by taskId (stored as jobId)
+        // Find the video record by taskId (stored as jobId or taskId)
         const video = await prisma.video.findFirst({
             where: {
-                jobId: data.taskId,
+                OR: [
+                    { jobId: taskId },
+                    { taskId: taskId },
+                ],
                 provider: 'veo3',
             },
         })
 
         if (!video) {
-            console.error(`Video not found for taskId: ${data.taskId}`)
+            console.error(`Video not found for taskId: ${taskId}`)
             return NextResponse.json({ error: 'Video not found' }, { status: 404 })
         }
 
-        // Status based on successFlag: 1 = success, other values = fail
-        const isSuccess = data.successFlag === 1
+        // Get video URL - try multiple possible locations
+        let videoUrl: string | null = null
+
+        // Try official record-info format first (data.response.resultUrls)
+        if (payload.data?.response?.resultUrls?.length) {
+            videoUrl = payload.data.response.resultUrls[0]
+        }
+        // Fallback to alternative callback format (data.result_urls or data.resultUrls)
+        else if (payload.data?.result_urls?.length) {
+            videoUrl = payload.data.result_urls[0]
+        }
+        else if (payload.data?.resultUrls?.length) {
+            videoUrl = payload.data.resultUrls[0]
+        }
+
+        // Determine success based on successFlag or code
+        // successFlag: 0=Generating, 1=Success, 2=Failed, 3=Generation Failed
+        const successFlag = payload.data?.successFlag
+        const isSuccess = (successFlag === 1) || (payload.code === 200 && videoUrl)
+
+        console.log(`Processing video ${video.id}: successFlag=${successFlag}, code=${payload.code}, hasVideoUrl=${!!videoUrl}`)
 
         // Update video based on result
-        if (isSuccess) {
-            const { videoUrl } = parseVeo3ResultJson(data.response)
-
+        if (isSuccess && videoUrl) {
             await prisma.video.update({
                 where: { id: video.id },
                 data: {
@@ -67,7 +102,6 @@ export async function POST(request: NextRequest) {
         } else {
             // Handle Refund if not already failed
             if (video.status !== 'failed') {
-                const COINS_PER_VIDEO = 15
                 await prisma.user.update({
                     where: { id: video.userId },
                     data: { coins: { increment: COINS_PER_VIDEO } },
@@ -90,7 +124,8 @@ export async function POST(request: NextRequest) {
                 },
             })
 
-            console.error(`Video ${video.id} failed: ${data.errorMessage}`)
+            const errorMsg = payload.data?.errorMessage || payload.msg || 'Unknown error'
+            console.error(`Video ${video.id} failed: ${errorMsg}`)
         }
 
         return NextResponse.json({ success: true })
@@ -102,3 +137,5 @@ export async function POST(request: NextRequest) {
         )
     }
 }
+
+
