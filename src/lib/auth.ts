@@ -48,14 +48,14 @@ export const authOptions: NextAuthOptions = {
 
             await prisma.user.update({
                 where: { id: user.id },
-                data: { coins: 50, coinsExpireAt: expire }
+                data: { coins: 40, coinsExpireAt: expire }
             })
 
             await prisma.transaction.create({
                 data: {
                     userId: user.id,
                     type: "bonus",
-                    amount: 50,
+                    amount: 40,
                     description: "Welcome bonus coins"
                 }
             })
