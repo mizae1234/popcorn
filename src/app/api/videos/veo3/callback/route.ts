@@ -3,42 +3,11 @@ import { prisma } from '@/lib/prisma'
 
 const COINS_PER_VIDEO = 15
 
-// Veo3 callback payload structure - supporting both callback and record-info formats
-interface Veo3CallbackPayload {
-    code: number
-    msg: string
-    data: {
-        taskId?: string
-        paramJson?: string
-        completeTime?: string
-        response?: {
-            taskId?: string
-            resultUrls?: string[]
-            originUrls?: string[]
-            resolution?: string
-        }
-        successFlag?: number  // 0=Generating, 1=Success, 2=Failed, 3=Generation Failed
-        errorCode?: number | null
-        errorMessage?: string | null
-        createTime?: string
-        fallbackFlag?: boolean
-        // Alternative callback format fields
-        info?: {
-            has_audio_list?: boolean[]
-        }
-        media_ids?: string[]
-        resolution?: string
-        resultUrls?: string[]
-        result_urls?: string[]
-        seeds?: number[]
-    }
-    // Some callbacks have taskId at root level
-    taskId?: string
-}
-
 export async function POST(request: NextRequest) {
     try {
-        const payload: Veo3CallbackPayload = await request.json()
+        // Use 'any' to avoid TypeScript type issues with dynamic JSON
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const payload: any = await request.json()
 
         console.log('Veo3 callback received:', JSON.stringify(payload, null, 2))
 
@@ -66,36 +35,33 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Video not found' }, { status: 404 })
         }
 
-        // Get video URL - try multiple possible locations with detailed logging
+        // Get video URL - access data as raw object without TypeScript interference
+        const data = payload.data || {}
+
+        // Debug: log the full data object to see actual structure
+        console.log('Debug - Full data object:', JSON.stringify(data))
+
         let videoUrl: string | null = null
 
-        // Debug: log the actual data structure
-        console.log('Debug - payload.data keys:', payload.data ? Object.keys(payload.data) : 'data is null/undefined')
-        console.log('Debug - payload.data.resultUrls:', payload.data?.resultUrls)
-        console.log('Debug - payload.data.result_urls:', payload.data?.result_urls)
-        console.log('Debug - payload.data.response:', payload.data?.response)
-
-        // Try official record-info format first (data.response.resultUrls)
-        if (payload.data?.response?.resultUrls && payload.data.response.resultUrls.length > 0) {
-            videoUrl = payload.data.response.resultUrls[0]
+        // Try all possible locations for video URL
+        if (data.response && data.response.resultUrls && data.response.resultUrls[0]) {
+            videoUrl = data.response.resultUrls[0]
             console.log('Found videoUrl in data.response.resultUrls:', videoUrl)
         }
-        // Fallback to alternative callback format (data.result_urls or data.resultUrls)
-        else if (payload.data?.result_urls && payload.data.result_urls.length > 0) {
-            videoUrl = payload.data.result_urls[0]
+        else if (data.result_urls && data.result_urls[0]) {
+            videoUrl = data.result_urls[0]
             console.log('Found videoUrl in data.result_urls:', videoUrl)
         }
-        else if (payload.data?.resultUrls && payload.data.resultUrls.length > 0) {
-            videoUrl = payload.data.resultUrls[0]
+        else if (data.resultUrls && data.resultUrls[0]) {
+            videoUrl = data.resultUrls[0]
             console.log('Found videoUrl in data.resultUrls:', videoUrl)
         }
         else {
-            console.log('No videoUrl found in any expected location')
+            console.log('No videoUrl found - data keys:', Object.keys(data))
         }
 
-        // Determine success based on successFlag or code
-        // successFlag: 0=Generating, 1=Success, 2=Failed, 3=Generation Failed
-        const successFlag = payload.data?.successFlag
+        // Determine success
+        const successFlag = data.successFlag
         const isSuccess = (successFlag === 1) || (payload.code === 200 && videoUrl)
 
         console.log(`Processing video ${video.id}: successFlag=${successFlag}, code=${payload.code}, hasVideoUrl=${!!videoUrl}, videoUrl=${videoUrl}`)
@@ -136,7 +102,7 @@ export async function POST(request: NextRequest) {
                 },
             })
 
-            const errorMsg = payload.data?.errorMessage || payload.msg || 'Unknown error'
+            const errorMsg = data.errorMessage || payload.msg || 'Unknown error'
             console.error(`Video ${video.id} failed: ${errorMsg}`)
         }
 
@@ -149,5 +115,3 @@ export async function POST(request: NextRequest) {
         )
     }
 }
-
-
